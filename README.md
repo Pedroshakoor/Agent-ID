@@ -110,28 +110,28 @@ tools = agentid_langchain_middleware(tools=my_tools, client=client)
 
 ```mermaid
 graph TB
-    subgraph "Your Agent"
-        A[Agent Code] -->|1. get_token()| SDK[AgentID SDK]
+    subgraph YourAgent[Your Agent]
+        A[Agent Code] -->|1. get token| SDK[AgentID SDK]
         A -->|3. use token| EXT[External APIs]
-        A -->|4. log_action()| SDK
+        A -->|4. log action| SDK
     end
 
-    subgraph "AgentID Server"
-        SDK -->|2. issue JWT| CRED[Credential Service\nRS256 JWT]
+    subgraph AgentIDServer[AgentID Server]
+        SDK -->|2. issue JWT| CRED[Credential Service RS256]
         CRED --> DB[(PostgreSQL)]
-        CRED --> POLICY[Policy Engine\nAllow/Deny Rules]
-        SDK --> AUDIT[Audit Service\nImmutable Logs]
+        CRED --> POLICY[Policy Engine]
+        SDK --> AUDIT[Audit Service]
         AUDIT --> DB
     end
 
-    subgraph "External Service (e.g. Gmail)"
-        EXT -->|5. verify token| VER[/v1/verify/]
+    subgraph ExternalService[External Service]
+        EXT -->|5. verify token| VER[verify endpoint]
         VER --> POLICY
-        VER -->|allowed/denied| EXT
+        VER -->|allowed or denied| EXT
     end
 
-    subgraph "Dashboard"
-        DASH[Next.js 15 UI] --> DB
+    subgraph Dashboard[Dashboard]
+        DASH[Next.js UI] --> DB
     end
 ```
 
@@ -185,8 +185,7 @@ Policies are simple JSON documents. Multiple policies can be attached to an agen
 - `stripe:charge:usd:*` — any USD charge
 - `*` — everything
 
-**Actions:** What the agent can do
-- `read`, `write`, `send`, `delete`, `*`
+**Actions:** What the agent can do — `read`, `write`, `send`, `delete`, `*`
 
 **Conditions:**
 | Condition | Type | Description |
@@ -256,7 +255,6 @@ Every call to `/v1/audit/log` records:
 ```python
 from agentid import AgentIDClient
 from agentid.middleware.langchain import agentid_langchain_middleware
-from langchain.tools import BaseTool
 
 async with AgentIDClient(...) as client:
     safe_tools = agentid_langchain_middleware(
@@ -292,15 +290,12 @@ async def verify_agent_token(token: str, action: str, resource: str) -> bool:
             json={"action": action, "resource": resource},
             headers={"Authorization": f"Bearer {token}"},
         )
-    result = resp.json()
-    return result["allowed"]
+    return resp.json()["allowed"]
 ```
 
 ---
 
 ## Configuration
-
-### Environment Variables
 
 | Variable | Default | Description |
 |---|---|---|
@@ -348,7 +343,6 @@ docker compose up -d
 - **Rate limiting** — 60 req/min per IP via slowapi + Redis.
 - **Input sanitization** — All inputs validated via Pydantic v2.
 - **CORS** — Configurable allowed origins; defaults to localhost only.
-- **Structured logging** — All requests logged with structlog (JSON, no sensitive data).
 - **Never log secrets** — API keys, tokens, and private keys are never written to logs.
 
 ### Key Rotation
@@ -407,10 +401,6 @@ Agent-ID/
 │   ├── python/           # agentid (PyPI)
 │   └── typescript/       # @agentid/sdk (npm)
 ├── examples/             # Integration examples
-│   ├── langchain_example.py
-│   ├── crewai_example.py
-│   ├── openai_example.py
-│   └── typescript_example.ts
 └── .github/workflows/    # CI/CD
 ```
 
@@ -427,7 +417,5 @@ MIT — see [LICENSE](LICENSE).
 ---
 
 *Built for the agent infrastructure era.*
-
----
 
 Made by [@pedroshakoor](https://x.com/pedroshakoor) — follow for updates.
