@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentid"
+version = "1.0.0"
+description = "AgentID Python SDK — verifiable identity for every AI agent"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+keywords = ["ai", "agent", "identity", "langchain", "crewai", "autogen"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "httpx>=0.27.0",
+    "pyjwt[crypto]>=2.9.0",
+]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.3.0"]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "respx>=0.21.0",
+    "ruff>=0.7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/agentid/agentid"
+Documentation = "https://agentid.dev/docs"
+Repository = "https://github.com/agentid/agentid"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agentid"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
